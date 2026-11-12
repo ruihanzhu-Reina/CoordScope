@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="demo/assets/icons.svg" width="44" height="44" alt="">
+<img src="docs/assets/research-showcase/coordscope-mark.svg" width="168" height="72" alt="机器人、协作节点与星星组成的 CoordScope 标志">
 
 <h1>CoordScope</h1>
 
@@ -20,7 +20,9 @@
 
 我们在同一批任务上比较多智能体调度协议。逐轮日志记录各角色读到的内容、传递的消息和执行的工具动作，配对实验则用来比较任务完成率与协作开销。
 
-## Findings
+<a name="findings"></a>
+
+## <img src="docs/assets/research-showcase/sparkles.svg" width="28" height="28" alt=""> Findings
 
 ### 固定增加辅助 Agent，完成率提升有限，成本增加很多
 
@@ -42,22 +44,93 @@ DeepSeek Pro 的星形配置比 DeepSeek Flash 的星形配置完成了更多任
 
 自适应配置的 Slack 14 案例中，Agent 识别了恶意内容并发出警告，但警告消息也转述了攻击目标要求传递的内容，最终被官方评分判定为攻击成功。风险识别与安全执行之间还隔着输出和工具动作，安全检查需要覆盖这些实际产生效果的环节。 [案例与审计分析](reports/2026-10-28-four-experiment-analysis/README.md)
 
-## Evaluation
+<a name="evaluation"></a>
+
+## <img src="docs/assets/research-showcase/chart.svg" width="28" height="28" alt=""> Evaluation
 
 实验涵盖 DeepSeek Flash、DeepSeek Pro 和 GPT-6 Luna，共六种配置。每组使用四个任务套件中的 80 个固定场景，对应 76 个不同用户任务，每个场景分别运行正常条件与攻击条件。六种配置加上一次按需调用方案的参考复跑，共有 1,120 条有效记录。实验采用 seed 42 和官方 direct 攻击。 [逐场景结果](reports/2026-10-29-completed-experiments/episode_results.csv) · [参考复跑](reports/2026-10-29-completed-experiments/README.md#重复运行与安全事件)
 
-| 模型与执行配置 | 正常完成率 ↑ | 攻击下完成率 ↑ | 攻击目标达成 ↓ | 总 token ↓ | 单次平均耗时 ↓ |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| DeepSeek Flash · 星形协作 · 4K | 81.25% | 82.50% | 1/80 | 25.60M | 164.87 s |
-| GPT-6 Luna · 星形协作 · 4K | 53.75% | 55.00% | 1/80 | 10.45M | 76.39 s |
-| DeepSeek Pro · 星形协作 · 16K | 86.25% | 86.25% | 4/80 | 26.91M | 304.41 s |
-| DeepSeek Flash · 原生自适应 · 16K | 81.25% | 82.50% | 1/80 | 28.13M | 209.23 s |
-| DeepSeek Flash · 按需调用辅助 Agent · 16K | 90.00% | 88.75% | 0/80 | **7.14M** | **29.90 s** |
-| DeepSeek Flash · 固定调用两个辅助 Agent · 16K | **91.25%** | **93.75%** | 0/80 | 13.14M | 61.92 s |
+<p><strong>表 1 · 六种配置的任务表现与运行开销</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2" align="left">模型</th>
+      <th rowspan="2" align="left">执行方式</th>
+      <th colspan="2" align="center">任务完成率 ↑</th>
+      <th rowspan="2" align="center">攻击目标<br>达成数 ↓</th>
+      <th colspan="2" align="center">资源开销 ↓</th>
+    </tr>
+    <tr>
+      <th align="center">正常条件</th>
+      <th align="center">攻击条件</th>
+      <th align="center">总 token<br>（百万）</th>
+      <th align="center">平均耗时<br>（秒 / 次）</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>DeepSeek<br>Flash</td>
+      <td>星形协作</td>
+      <td align="right">81.25%</td>
+      <td align="right">82.50%</td>
+      <td align="right">1/80</td>
+      <td align="right">25.60</td>
+      <td align="right">164.87</td>
+    </tr>
+    <tr>
+      <td>GPT-6 Luna</td>
+      <td>星形协作</td>
+      <td align="right">53.75%</td>
+      <td align="right">55.00%</td>
+      <td align="right">1/80</td>
+      <td align="right">10.45</td>
+      <td align="right">76.39</td>
+    </tr>
+    <tr>
+      <td>DeepSeek<br>Pro</td>
+      <td>星形协作</td>
+      <td align="right">86.25%</td>
+      <td align="right">86.25%</td>
+      <td align="right">4/80</td>
+      <td align="right">26.91</td>
+      <td align="right">304.41</td>
+    </tr>
+    <tr>
+      <td>DeepSeek<br>Flash</td>
+      <td>原生自适应</td>
+      <td align="right">81.25%</td>
+      <td align="right">82.50%</td>
+      <td align="right">1/80</td>
+      <td align="right">28.13</td>
+      <td align="right">209.23</td>
+    </tr>
+    <tr>
+      <td>DeepSeek<br>Flash</td>
+      <td>按需调用辅助 Agent</td>
+      <td align="right">90.00%</td>
+      <td align="right">88.75%</td>
+      <td align="right"><strong>0/80</strong></td>
+      <td align="right"><strong>7.14</strong></td>
+      <td align="right"><strong>29.90</strong></td>
+    </tr>
+    <tr>
+      <td>DeepSeek<br>Flash</td>
+      <td>固定调用两个辅助 Agent</td>
+      <td align="right"><strong>91.25%</strong></td>
+      <td align="right"><strong>93.75%</strong></td>
+      <td align="right"><strong>0/80</strong></td>
+      <td align="right">13.14</td>
+      <td align="right">61.92</td>
+    </tr>
+  </tbody>
+</table>
+
+加粗表示本表中的最优观测值（含并列）；↑ 越高越好，↓ 越低越好。
 
 GPT-6 Luna 的名称依据项目方向服务商核实后的反馈更正，原始运行记录中的请求标识为 `gpt-4o`。
 
-4K 与 16K 表示单次输出上限。总 token 合计每组 80 次正常运行和 80 次攻击运行。按需调用与固定调用两个辅助 Agent 的两组各有 4 条攻击记录的暴露状态未知。 [完整结果及指标定义](reports/2026-10-29-completed-experiments/README.md#结果总表)
+输出上限：DeepSeek Flash 和 GPT-6 Luna 的星形配置为每次请求 4,096 token（4K），其余配置为 16,384 token（16K）。Token 是模型处理文本的计量单位，不能直接等同于字数；实际输出可以短于这个上限。表中的「总 token」则合计每组 80 次正常运行和 80 次攻击运行的用量。按需调用与固定调用两个辅助 Agent 的两组各有 4 条攻击记录的暴露状态未知。 [完整结果及指标定义](reports/2026-10-29-completed-experiments/README.md#结果总表)
 
 两种辅助 Agent 调用方案的配对实验同时改变了辅助 Agent 启动、分工和汇报方式，比较对象是完整调度协议。其余历史配置还存在模型记录、输出上限和审计方式的差异，配置间比较用于描述观测结果。Flash 的历史模型记录包含 `deepseek-v4-flash` 和 `deepseek-flash`，Pro 记录为 `deepseek-v4-pro`。以上发现适用于这批单随机种子、固定攻击设置下的任务。 [实验设计与适用范围](reports/2026-10-29-completed-experiments/README.md#配置与证据边界)
 
@@ -67,7 +140,9 @@ GPT-6 Luna 的名称依据项目方向服务商核实后的反馈更正，原始
   <em>图 1 · DeepSeek Flash、16K 输出上限下的三种执行配置。纵轴为攻击条件下的任务完成率，横轴合计正常与攻击条件的 token。</em>
 </p>
 
-## Demo
+<a name="demo"></a>
+
+## <img src="docs/assets/research-showcase/robot.svg" width="28" height="28" alt=""> Demo
 
 在离线演示中可以点选消息、网页读取和目标调用，查看对应的发送方、接收方或工具记录。完整演示还支持按场景筛选、对照拓扑回合，以及切换 Clean 和 Attack 逐步回放。 [演示说明](demo/README.md)
 
@@ -77,7 +152,9 @@ GPT-6 Luna 的名称依据项目方向服务商核实后的反馈更正，原始
   <em>图 2 · Slack 07 攻击条件下的信息来源与工具调用。m 为消息编号，# 为工具调用序号。</em>
 </p>
 
-## Reproducibility
+<a name="reproducibility"></a>
+
+## <img src="docs/assets/research-showcase/records.svg" width="28" height="28" alt=""> Reproducibility
 
 | 复核内容 | 入口 |
 | --- | --- |
