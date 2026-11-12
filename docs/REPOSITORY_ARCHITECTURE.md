@@ -1,6 +1,6 @@
 # 仓库架构与阅读路线
 
-本仓库 `AgentDojo-MANTA-Adapter` 把 MANTA 多智能体执行层接入 AgentDojo 官方任务、工具、攻击与评分。复现实验以冻结场景为单位，模型通过独立 provider 配置选择。当前已有原 DeepSeek、GPT-4o、DeepSeek Pro 16K、Flash 自适应 16K 四轮正式结果，以及 context/graph 机制实验。
+本仓库 `CoordScope` 把 MANTA 多智能体执行层接入 AgentDojo 官方任务、工具、攻击与评分。复现实验以冻结场景为单位，模型通过独立 provider 配置选择。当前已有原 DeepSeek、GPT-4o、DeepSeek Pro 16K、Flash 自适应 16K 四轮正式结果，以及 context/graph 机制实验。
 
 Flash 自适应实验通过显式 `adaptive_native` 策略保留 Planner 和修复器接受的图结构，工具继续即时作用于官方模拟环境；补丁涉及 `MAS/config.py` 和 `MAS/self_evolved/engine.py`，上游默认策略不变。模型协议仍由适配层管理。结果、实际执行图、预算和脱敏日志见 [本轮报告](../reports/2026-10-28-deepseek-flash-adaptive/README.md)。
 
@@ -11,7 +11,7 @@ DeepSeek Pro 相关入口：`src/agentdojo_manta/deepseek_pro.py` 保留 reasoni
 ## 目录结构
 
 ```text
-AgentDojo-MANTA-Adapter/
+CoordScope/
 ├── README.md                         项目入口、结果摘要与导航
 ├── pyproject.toml / uv.lock           Python 包与锁定依赖
 ├── src/

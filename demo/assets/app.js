@@ -35,6 +35,7 @@ const ratio = (count, total) => total ? `${n(count)}/${n(total)}` : "—";
 const yes = (value) => value == null ? "UNKNOWN" : value ? "是" : "否";
 const suiteName = (name) => ({ all: "全部 suites", banking: "Banking", slack: "Slack", travel: "Travel", workspace: "Workspace" })[name] || name;
 const conditionName = (name) => ({ all: "全部条件", clean: "Clean", attack: "Attack" })[name] || name;
+const cohortLabel = (cohort) => cohort.id === "gpt4o_star" ? "GPT-6 Luna · 星形协作 · 4K" : cohort.label;
 const actorName = (id) => ({
   agent_0: "Coordinator", agent_1: "Worker 1", agent_2: "Worker 2",
   final_synthesizer: "Final Synthesizer", constraint_reconciler: "Constraint Reconciler",
@@ -110,10 +111,9 @@ function overview() {
   if (!state.cohort) state.cohort = cohorts[0].id;
   return `<header class="hero">
     <div><p class="eyebrow">Multi-Agent Systems · Research Demo</p>
-    <h1><span>超越通信拓扑：</span><span>多智能体系统的<span class="phrase">信息流</span>与<span class="phrase">执行动态</span>研究</span></h1>
-    <p class="subtitle" lang="en">Beyond Communication Topology: Understanding Information Flow and Execution Dynamics in Multi-Agent Systems</p>
+    <h1><span>CoordScope</span><span>多智能体系统中的协调、成本与安全</span></h1>
+    <p class="subtitle" lang="en">Coordination, Cost, and Security in Multi-Agent Systems</p>
     <p class="abstract">多智能体协作扩大了外部信息进入决策与工具执行的路径。我们在 AgentDojo 冻结场景中，沿归档记录追踪内容何时进入模型输入、怎样经消息和工具传播，以及何时影响正式评分。</p>
-    <p class="micro" lang="en">MANTA × AgentDojo: Multi-Agent Security Evaluation and Execution Analysis.</p>
     <div class="actions"><a class="button primary" href="#exposure">探索五项发现 ${icon("arrow")}</a><a class="button" href="#audit">回放 Slack 07</a></div></div>
     ${overviewGraphic()}</header>
     ${metrics([[n(study.scenes_per_cohort), "冻结场景 / cohort", `${n(study.tasks_per_cohort)} 个不同任务标识`],
@@ -123,7 +123,7 @@ function overview() {
     <div class="split"><section class="panel"><div class="panel-head"><div><h2>实验概览</h2><p class="micro">选择一个 cohort 查看分母、评分与成本。</p></div>${tag(`Seed ${study.seed}`)}</div>
     <div class="legend"><span><i class="swatch"></i>Clean</span><span><i class="swatch teal"></i>Attack</span></div>
     <div class="cohort-chart" aria-label="各 cohort 有效记录数">${cohorts.map((cohort) =>
-      `<button type="button" class="cohort-row${cohort.repeat ? " repeat" : ""}" data-cohort="${esc(cohort.id)}" aria-pressed="${state.cohort === cohort.id}"><span>${esc(cohort.label)} ${cohort.repeat ? tag("参考复跑", "amber") : ""}</span>${fractionBar(cohort.clean_n, cohort.episodes, "blue", "teal", false)}<span>${cohort.episodes}</span></button>`).join("")}</div>
+      `<button type="button" class="cohort-row${cohort.repeat ? " repeat" : ""}" data-cohort="${esc(cohort.id)}" aria-pressed="${state.cohort === cohort.id}"><span>${esc(cohortLabel(cohort))} ${cohort.repeat ? tag("参考复跑", "amber") : ""}</span>${fractionBar(cohort.clean_n, cohort.episodes, "blue", "teal", false)}<span>${cohort.episodes}</span></button>`).join("")}</div>
     </section><section class="panel" id="overview-detail" aria-label="所选 cohort 记录">${overviewDetail()}</section></div>
     ${note(`${n(study.episode_records)} 条记录共享 ${study.scenes_per_cohort} 个冻结场景，其中包括重复 Banking 用户任务。攻击族为 ${esc(study.attack_family)}。不同模型与执行配置的结果用于描述观察到的差异。`)}
     ${dataLinks("summary", "episodes")}`;
@@ -151,7 +151,7 @@ function overviewDetail() {
   const tokens = rows.every(({ tokens }) => tokens != null) ? rows.reduce((sum, row) => sum + row.tokens, 0) : null;
   const latency = rows.length && rows.every(({ latency_s }) => latency_s != null)
     ? rows.reduce((sum, row) => sum + row.latency_s, 0) / rows.length : null;
-  return `<div class="panel-head"><div><h2>${esc(cohort.label)}</h2><p class="micro mono">${esc(cohort.model)} · ${esc(cohort.id)}</p></div></div>
+  return `<div class="panel-head"><div><h2>${esc(cohortLabel(cohort))}</h2><p class="micro mono">原始模型标识 ${esc(cohort.model)} · ${esc(cohort.id)}</p>${cohort.id === "gpt4o_star" ? '<p class="micro">模型名称依据项目方向服务商核实后的反馈更正为 GPT-6 Luna。</p>' : ""}</div></div>
     <div class="filters">${select("overview-suite", "Suite", ["all", ...suites], state.overviewSuite, suiteName)}
     ${select("overview-condition", "Condition", ["all", "clean", "attack"], state.overviewCondition, conditionName)}
     ${select("overview-scene", "Scene", ["all", ...scenes], state.overviewScene, (v) => v === "all" ? "全部场景" : v)}</div>

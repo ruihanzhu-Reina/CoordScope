@@ -2,7 +2,7 @@
 
 Defining your own task suite and tasks enables you to create new benchmarks to extend ours, or to create a new benchmark from scratch.
 
-You can find an example toy suite in the archived [examples](https://github.com/ruihanzhu-Reina/AgentDojo-MANTA-Adapter/tree/main/archive/examples/counter_benchmark). This is the suite that we cover in this guide.
+You can find an example toy suite in the archived [examples](https://github.com/ruihanzhu-Reina/CoordScope/tree/main/archive/examples/counter_benchmark). This is the suite that we cover in this guide.
 
 ## Task suite
 

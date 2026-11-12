@@ -1,6 +1,6 @@
-# MANTA × AgentDojo Research Demo
+# CoordScope Research Demo
 
-**超越通信拓扑：多智能体系统的信息流与执行动态研究**
+**Coordination, Cost, and Security in Multi-Agent Systems**
 
 用中文展示多智能体 AgentDojo 实验的评分、可观察信息来源、逐轮拓扑与执行成本。完整演示只需 Python 标准库和本机浏览器。
 

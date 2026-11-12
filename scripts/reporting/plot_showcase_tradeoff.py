@@ -12,8 +12,8 @@ OUTPUT = ROOT / "docs/assets/research-showcase/worker-tradeoff.svg"
 
 # Names, colors, shapes and offsets affect presentation only.
 STYLES = {
-    "F": ("On-demand workers", "#12698e", "o", (12, 0), "left"),
-    "W": ("Two fixed workers", "#08745f", "s", (12, 0), "left"),
+    "F": ("On-demand agents", "#12698e", "o", (12, 0), "left"),
+    "W": ("Two fixed agents", "#08745f", "s", (12, 0), "left"),
     "flash16k_adaptive": ("Native adaptive", "#566578", "D", (-12, 0), "right"),
 }
 

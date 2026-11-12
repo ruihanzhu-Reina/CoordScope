@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the offline MANTA × AgentDojo demo from archived reports."""
+"""Build the offline CoordScope demo from archived reports."""
 
 import argparse
 import csv
@@ -13,7 +13,7 @@ from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[2]
 BASE = "c60fc554dd99db3880a6dfc77be5b8b05c867464"
-SOURCE_URL = f"https://github.com/ruihanzhu5-cyber/AgentDojo-MANTA-Adapter/blob/{BASE}/"
+SOURCE_URL = f"https://github.com/ruihanzhu-Reina/CoordScope/blob/{BASE}/"
 COMPLETED = "reports/2026-10-29-completed-experiments"
 FLASH = "reports/2026-10-19-manta-agentdojo"
 ADAPTIVE = "reports/2026-10-28-deepseek-flash-adaptive"
