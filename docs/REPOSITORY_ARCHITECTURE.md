@@ -13,7 +13,6 @@ DeepSeek Pro 相关入口：`src/agentdojo_manta/deepseek_pro.py` 保留 reasoni
 ```text
 AgentDojo-MANTA-Adapter/
 ├── README.md                         项目入口、结果摘要与导航
-├── .env.example                      不含凭证的本地配置样例
 ├── pyproject.toml / uv.lock           Python 包与锁定依赖
 ├── src/
 │   ├── agentdojo/                    官方 AgentDojo 实现
@@ -68,7 +67,7 @@ AgentDojo-MANTA-Adapter/
 ├── runs/                            上游/历史运行材料，不进入本轮统计
 ├── examples/ / notebooks/            上游示例与探索材料
 ├── util_scripts/                     上游数据表和结果处理辅助脚本
-├── LICENSE / CITATION.bib            许可证和上游引用信息
+├── LICENSE / docs/CITATION.bib       许可证和上游引用信息
 └── .github/ / .devcontainer/          CI 与开发环境配置
 ```
 

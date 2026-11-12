@@ -79,7 +79,7 @@
 
 ## Credits
 
-AgentDojo 提供实验任务、工具和评分基准，仓库内的 MANTA 源码快照提供执行引擎。 [AgentDojo 项目](https://github.com/ethz-spylab/agentdojo) · [论文引用](CITATION.bib) · [MANTA 源码](upstreams/manta/) · [仓库许可证](LICENSE) · [MANTA 许可证](upstreams/manta/LICENSE)
+AgentDojo 提供实验任务、工具和评分基准，仓库内的 MANTA 源码快照提供执行引擎。 [AgentDojo 项目](https://github.com/ethz-spylab/agentdojo) · [论文引用](docs/CITATION.bib) · [MANTA 源码](upstreams/manta/) · [仓库许可证](LICENSE) · [MANTA 许可证](upstreams/manta/LICENSE)
 
 <details>
 <summary>AgentDojo 上游 README 与使用说明</summary>

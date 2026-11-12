@@ -16,6 +16,8 @@ from decimal import Decimal
 from contextlib import contextmanager
 from pathlib import Path
 
+from .providers import provider_config
+
 
 class BudgetExceeded(RuntimeError):
     pass
@@ -155,7 +157,7 @@ class GPT4oBudget(RequestBudget):
             sources = {r["path"]: r for r in evidence["sources"]}
             price = sources["/api/pricing"]
             billing = sources["/api/log/token"]
-            if (evidence.get("endpoint") != "https://api2.aigcbest.top/v1" or
+            if (evidence.get("endpoint") != provider_config("gpt-4o").base_url or
                     not sources["/v1/models"].get("gpt4o_visible") or
                     price.get("http_status") != 200 or billing.get("http_status") != 200 or
                     not price.get("gpt4o") or not billing.get("latest_gpt4o_billing")):

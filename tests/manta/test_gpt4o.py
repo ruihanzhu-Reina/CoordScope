@@ -35,6 +35,16 @@ class GPT4oTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             provider_config("gpt-4.1")
 
+    def test_qdd_endpoint_comes_from_local_configuration(self):
+        endpoint = "https://gateway.invalid/v1"
+        with patch.dict(os.environ, {"MANTA_PROVIDER": "qdd", "QDD_BASE_URL": endpoint + "/"}):
+            self.assertEqual(provider_config().base_url, endpoint)
+        with patch.dict(os.environ, {"MANTA_PROVIDER": "qdd", "OPENAI_BASE_URL": endpoint, "QDD_BASE_URL": ""}):
+            self.assertEqual(provider_config().base_url, endpoint)
+        with patch.dict(os.environ, {"MANTA_PROVIDER": "qdd", "OPENAI_BASE_URL": "", "QDD_BASE_URL": ""}):
+            with self.assertRaisesRegex(ValueError, "QDD_BASE_URL"):
+                provider_config()
+
     def test_baseline_sampling_ignores_openrouter_overrides(self):
         os.environ["OPENROUTER_MAX_TOKENS"] = "393216"
         result = gpt4o_sampling({"model": "gpt-4o", "max_tokens": 100, "extra_body": {"provider": {}}}, temperature=0)

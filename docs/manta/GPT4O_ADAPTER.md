@@ -15,7 +15,7 @@
 | `replication.check_pilot()` | 检查 8 条 Pilot 的有效评分、usage、交接、拓扑及账本；本轮用户在 4 条后停止，并明确选择跳过剩余验收 |
 | `run_formal.py` | 沿用独立 episode 进程和恢复逻辑，增加 GPT-4o provider、独立输出、预算与 Pilot gate |
 
-`MANTA_PROVIDER` 为 `deepseek` 时保留原 DeepSeek 路由与费率；`openai` 对应官方 endpoint；本轮实际使用 `qdd` 和已配置的 GPT-4o 连接。`OPENAI_API_KEY` 从未使用 DeepSeek 变量承载。实际 endpoint 和模型响应 ID 保存在 provenance 与日志中。
+`MANTA_PROVIDER` 为 `deepseek` 时保留原 DeepSeek 路由与费率；`openai` 对应官方 endpoint；本轮实际使用 `qdd` 和已配置的 GPT-4o 连接。`OPENAI_API_KEY` 从未使用 DeepSeek 变量承载。实际 endpoint 保存在本地日志中，公开副本对自用网关地址作脱敏。模型响应 ID 保留在来源记录中。
 
 ## 不变的执行设置
 
@@ -40,7 +40,7 @@ MANTA 原有 tool-memory/context 整理逻辑保留；未新增为适应 GPT-4o 
 
 ## 本地运行与证据复核
 
-先复制 `.env.example` 为本机忽略的 `.env` 并填入自己的 key；不要将 `.env` 提交到 Git。路由证据由只读脚本生成。下面给出接口入口供复现，不会在打开文档时自动执行：
+在仓库根目录的本地 `.env` 或进程环境中设置 `MANTA_PROVIDER=qdd`、`QDD_BASE_URL`、`OPENAI_API_KEY` 与 `GPT4O_PRICING_EVIDENCE`。已有的 QDD 配置也可继续通过 `OPENAI_BASE_URL` 提供地址。`.env` 由 Git 忽略。路由与账单证据由下方脚本生成。
 
 ```powershell
 uv sync --locked --no-dev --python 3.12

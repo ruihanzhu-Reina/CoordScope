@@ -17,6 +17,7 @@ import sys
 import tarfile
 from collections import Counter, defaultdict
 from pathlib import Path
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "results/v1"
@@ -420,7 +421,7 @@ def archive_logs(redactor):
     save_csv("published_log_inventory.csv",inventory)
     save_json("redaction_summary.json",dict(scope="all retained GPT-4o formal, pilot and preflight logs", archives=archives,
         replacements=dict(redactor.counts), raw_files_untouched=True,
-        notes=["Credentials and local user homes are removed; synthetic account/contact/secret values are pseudonymized.",
+        notes=["Credentials, private API routes and local user homes are removed; synthetic account/contact/secret values are pseudonymized.",
                "Scores, exposure and correlations are computed on originals before redaction.",
                "Redacted logs support inspection but cannot reproduce byte-exact judging.",
                "Failed attempts and pilot logs are retained and excluded from the 160 formal selected episodes."]))
@@ -450,7 +451,7 @@ def render_report(metrics, pairs, summary, attempts, checks, provenance):
            "| Planner / Audit | task_conditioned / heuristic |",
            "| max_turns / repair_budget / max_tool_iterations | 2 / 1 / 8 |",
            "| 单请求输出 / 超时 / episode 进程并发 | 4096 tokens / 180 秒 / 8 |",
-           "| 请求模型 / provider / endpoint | gpt-4o / qdd / https://api2.aigcbest.top/v1 |",
+           "| 请求模型 / provider | gpt-4o / qdd |",
            "| 正式累计费用上限 | 用户指定 $100，重启共享原账本 |",
            "| Pilot | 完成 4/8 后由用户停止，剩余验收经用户选择跳过；正式 manifest 保留该记录 |", "",
            "已逐一核对 160 条有效结果与官方 TraceLogger utility/security；全部任务身份、80 个 payload 哈希、响应 usage 和执行源码摘要匹配。SQLite 账本的 2,449 条 settled 请求与持久化 API 日志逐条一致。详见 [audit_checks.json](audit_checks.json)。这些是机械一致性核对，不是独立跨模型研究审计。", "",
@@ -547,7 +548,11 @@ def main():
         checksums()
         return
     legacy=module('legacy_publication',ROOT/'scripts/reporting/publish_manta_results.py')
-    redactor=legacy.Redactor()
+    manifest = load(RUN / "manifest.json")
+    private_host = urlsplit(manifest["endpoint"]).hostname if manifest["provider"] == "qdd" else None
+    if manifest["provider"] == "qdd" and not private_host:
+        raise ValueError("Local QDD manifest lacks an endpoint for export redaction")
+    redactor = legacy.Redactor(private_host=private_host)
     manifest, summary, gpt, attempts, checks, provenance=select_gpt4o(redactor)
     baseline=load_baseline(args.baseline_results)
     metrics,pairs=analyze_pairing(baseline,gpt)

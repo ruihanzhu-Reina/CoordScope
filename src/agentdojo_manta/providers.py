@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from urllib.parse import urlsplit
 
 
 @dataclass(frozen=True)
@@ -24,14 +25,22 @@ def provider_config(model: str | None = None) -> Provider:
         return Provider(name, os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1"),
                         os.getenv("DEEPSEEK_API_KEY") or os.getenv("OPENAI_COMPATIBLE_API_KEY"), model,
                         os.getenv("DEEPSEEK_PLANNER_MODEL", model), os.getenv("DEEPSEEK_AUDITOR_MODEL", model))
-    endpoints = {"openai": "https://api.openai.com/v1", "qdd": "https://api2.aigcbest.top/v1"}
-    if name not in endpoints:
+    if name not in {"openai", "qdd"}:
         raise ValueError(f"Unsupported explicit provider: {name}")
     if model not in (None, "gpt-4o"):
         raise ValueError("GPT-4o replication requires exactly gpt-4o for every role")
-    endpoint = os.getenv("OPENAI_BASE_URL", endpoints[name]).rstrip("/")
-    if endpoint != endpoints[name]:
-        raise ValueError(f"Endpoint does not match explicitly selected provider {name}")
+    official = "https://api.openai.com/v1"
+    if name == "qdd":
+        endpoint = (os.getenv("QDD_BASE_URL") or os.getenv("OPENAI_BASE_URL") or "").strip().rstrip("/")
+        parsed = urlsplit(endpoint)
+        if (parsed.scheme != "https" or not parsed.hostname or parsed.hostname == urlsplit(official).hostname
+                or parsed.username is not None or parsed.password is not None or parsed.path != "/v1"
+                or parsed.query or parsed.fragment):
+            raise ValueError("Configure the QDD HTTPS /v1 endpoint in QDD_BASE_URL")
+    else:
+        endpoint = os.getenv("OPENAI_BASE_URL", official).rstrip("/")
+        if endpoint != official:
+            raise ValueError("Endpoint does not match explicitly selected provider openai")
     for key in ("OPENAI_MODEL", "OPENAI_PLANNER_MODEL", "OPENAI_AUDITOR_MODEL"):
         if os.getenv(key, "gpt-4o") != "gpt-4o":
             raise ValueError(f"{key} must be gpt-4o")

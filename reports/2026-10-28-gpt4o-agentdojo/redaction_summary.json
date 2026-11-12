@@ -4,51 +4,51 @@
     {
       "archive": "logs/formal-banking.tar.gz",
       "files": 200,
-      "compressed_bytes": 3226967,
+      "compressed_bytes": 3224992,
       "raw_bytes": 32356520,
-      "sha256": "c749a513ed8211765b84e7d6f8d0541d117ddec51dad4327f122d5d112bdb6b9"
+      "sha256": "822d411048d6c53de365c8f07334b821e69f1151033905febd568d311cc5db79"
     },
     {
       "archive": "logs/formal-control-and-resume.tar.gz",
       "files": 8,
       "compressed_bytes": 143184,
       "raw_bytes": 348502,
-      "sha256": "93f2edeca028e4a1fdc3ab1849efc7cce625f25c4bda1942858480fb63ae60a2"
+      "sha256": "1eaaf9b00fc248957fe2928cf4d6bae9476b88145b98b04812846eda74d3dc38"
     },
     {
       "archive": "logs/formal-slack.tar.gz",
       "files": 200,
-      "compressed_bytes": 3045344,
+      "compressed_bytes": 3044422,
       "raw_bytes": 32838014,
-      "sha256": "de3b4aa266bc78dea697b3d1e928426b02c59f2f254d73ae9943b061cb27be29"
+      "sha256": "ec69e8ee256077bf253e99c6574e25fd92092b852a29df6cde6e343f00bb0c3f"
     },
     {
       "archive": "logs/formal-travel.tar.gz",
       "files": 288,
-      "compressed_bytes": 10138046,
+      "compressed_bytes": 10136161,
       "raw_bytes": 82305234,
-      "sha256": "14b2a021b415eeed75855723579af8b6670ab40afa7708f734eaa74006a9e67a"
+      "sha256": "4fa2c153c509011133854f966ed2355d9d80bd256e08dbe124126672175acf77"
     },
     {
       "archive": "logs/formal-workspace.tar.gz",
       "files": 200,
-      "compressed_bytes": 6029020,
+      "compressed_bytes": 6026776,
       "raw_bytes": 53987520,
-      "sha256": "2d27df22c1b80c5fca026d245a9fcd63abd3157c8f4ff0bd78e5908b6c4c09a1"
+      "sha256": "85439e46d96fee2211c32ac38acb38ae85f4e76c53bfbb0656a7822b16409afb"
     },
     {
       "archive": "logs/pilot.tar.gz",
       "files": 29,
-      "compressed_bytes": 264035,
+      "compressed_bytes": 263981,
       "raw_bytes": 2572418,
-      "sha256": "aea4754dd7fe1fa4c711cfa93875fbea1d6626e0adbfecc53f6253b9776148c5"
+      "sha256": "a8901d2a9d2620b08bee2f83cc2a91c572471891062797d3d5dc36c8c057eb59"
     },
     {
       "archive": "logs/preflight.tar.gz",
       "files": 8,
-      "compressed_bytes": 3733,
+      "compressed_bytes": 3741,
       "raw_bytes": 11242,
-      "sha256": "ceed13f519e6d008031572879a7e083ceeb5f4053585a0f28ca74e538374027f"
+      "sha256": "433379c982cbc21a7e1c7cc163d65815b43aa06cf9a2294f189657ac59b7f30c"
     }
   ],
   "replacements": {
@@ -58,13 +58,15 @@
     "ACCOUNT": 18396,
     "SENSITIVE_FIELD": 273,
     "INLINE_SECRET": 517,
-    "LONG_IDENTIFIER": 403
+    "LONG_IDENTIFIER": 403,
+    "API_ENDPOINT": 10512
   },
   "raw_files_untouched": true,
   "notes": [
     "Credentials and local user homes are removed; synthetic account/contact/secret values are pseudonymized.",
     "Scores, exposure and correlations are computed on originals before redaction.",
     "Redacted logs support inspection but cannot reproduce byte-exact judging.",
-    "Failed attempts and pilot logs are retained and excluded from the 160 formal selected episodes."
+    "Failed attempts and pilot logs are retained and excluded from the 160 formal selected episodes.",
+    "The public files and archives redact the private API gateway address. Original data and hashes are preserved."
   ]
 }

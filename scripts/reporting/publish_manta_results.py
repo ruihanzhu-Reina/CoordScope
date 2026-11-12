@@ -54,8 +54,13 @@ class Redactor:
     bearer = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/-]{12,}=*")
     pem = re.compile(r"-----BEGIN [^-]*PRIVATE KEY-----.*?-----END [^-]*PRIVATE KEY-----", re.S)
 
-    def __init__(self):
+    def __init__(self, private_host: str | None = None):
         self.counts, self.identities = Counter(), {}
+        self.private_host = private_host.lower() if private_host else None
+        self.private_urls = (re.compile(
+            rf"(?<![\w.-])(?:https?://)?{re.escape(self.private_host)}(?::\d+)?"
+            r"(?:/[^\s\"'<>\\)\],;]*)?(?![\w.-])", re.I
+        ) if self.private_host else None)
         env = dict(os.environ)
         from dotenv import dotenv_values
         env.update({k: v for k, v in dotenv_values(ROOT / ".env").items() if v})
@@ -72,6 +77,8 @@ class Redactor:
         return f"<REDACTED_{category}>"
 
     def text(self, value):
+        if self.private_urls:
+            value = self.private_urls.sub(lambda _: self.marker("API_ENDPOINT"), value)
         dates = []
         def protect_date(match):
             dates.append(match[0])
@@ -102,6 +109,8 @@ class Redactor:
 
     def scan(self, data):
         text = data.decode("utf-8", errors="ignore")
+        if self.private_host and self.private_host in text.lower():
+            raise ValueError("Private API host remains in exported content")
         if any(s in text for s in self.secrets) or any(p.search(text) for p in (self.credential, self.jwt, self.pem, self.home)):
             raise ValueError("Credential/private path remains in exported content; refusing publication")
 

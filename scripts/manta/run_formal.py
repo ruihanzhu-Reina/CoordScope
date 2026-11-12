@@ -147,7 +147,8 @@ def main():
                      and not k.endswith(("_KEY", "_ACCESS_TOKEN", "_SECRET", "_PASSWORD"))]
         if forbidden:
             parser.error(f"Remove unverified inherited runtime overrides: {', '.join(sorted(forbidden))}")
-        manifest = load_replication_plan(ROOT, provider=provider, source_digest=fingerprint(), pilot=args.pilot)
+        manifest = load_replication_plan(ROOT, provider=provider, source_digest=fingerprint(),
+                                         pilot=args.pilot, endpoint=binding.base_url)
         manifest["pilot_validation"] = "waived_by_operator" if args.skip_pilot_check else "required"
         manifest["pricing_multiplier"] = os.getenv("GPT4O_PRICE_MULTIPLIER", "1")
         if provider == "qdd" and os.getenv("GPT4O_PRICING_EVIDENCE"):

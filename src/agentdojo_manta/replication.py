@@ -9,7 +9,8 @@ from collections import Counter
 from pathlib import Path
 
 
-def load_replication_plan(root: Path, *, provider: str, source_digest: str, pilot: bool = False, model: str = "gpt-4o"):
+def load_replication_plan(root: Path, *, provider: str, source_digest: str, pilot: bool = False,
+                          model: str = "gpt-4o", endpoint: str | None = None):
     from agentdojo.attacks.attack_registry import load_attack
     from agentdojo.task_suite.load_suites import get_suites
     source = root / "reports/2026-10-19-manta-agentdojo/manifest.json"
@@ -38,11 +39,11 @@ def load_replication_plan(root: Path, *, provider: str, source_digest: str, pilo
     plan = copy.deepcopy(original)
     if model not in {"gpt-4o", "deepseek-v4-pro", "deepseek-flash"} or (model.startswith("deepseek") and provider != "deepseek"):
         raise ValueError("Unsupported model/provider replication pair")
-    plan.update(provider=provider, endpoint={"qdd": "https://api2.aigcbest.top/v1", "openai": "https://api.openai.com/v1", "deepseek": "https://api.deepseek.com/v1"}[provider],
+    plan.update(provider=provider, endpoint=endpoint or {"qdd": None, "openai": "https://api.openai.com/v1", "deepseek": "https://api.deepseek.com/v1"}[provider],
                 original_manifest_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
                 source_sha256=source_digest, planner_model=model, auditor_model=model,
                 stage="pilot" if pilot else "formal", max_tool_iterations=8,
-                pricing_source="https://api2.aigcbest.top/api/pricing" if provider == "qdd" else "https://developers.openai.com/api/docs/models/gpt-4o",
+                pricing_source="local QDD account pricing evidence" if provider == "qdd" else "https://developers.openai.com/api/docs/models/gpt-4o",
                 budget_accounting="GPT-4o independent rates; uncached upper bound; unresolved requests retain full reservation")
     plan["config"]["model"] = model
     if model.startswith("deepseek"):

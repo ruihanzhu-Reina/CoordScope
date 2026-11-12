@@ -27,7 +27,7 @@ Checked 2026-10-28 (Asia/Shanghai). Phase 1 review completed before any model re
 
 ## Runtime configuration
 
-The user selected their existing GPT-4o connection: provider `qdd`, endpoint `https://api2.aigcbest.top/v1`, credential variable `OPENAI_API_KEY`. Credential values must never be logged or committed. Request model remains `gpt-4o`; record the response model verbatim. Route capabilities, account pricing and real availability require verification; no other model is permitted.
+The user selected their existing GPT-4o connection: provider `qdd`, a locally configured endpoint, credential variable `OPENAI_API_KEY`. Credential values must never be logged or committed. Request model remains `gpt-4o`; record the response model verbatim. Route capabilities, account pricing and real availability require verification; no other model is permitted.
 
 Pilot cap is $10 cumulative, including failed/unreturned requests. Formal cap has not been configured and must be supplied explicitly before launch. Pilot and formal results must use separate directories and ledgers.
 
@@ -46,4 +46,4 @@ Published selected DeepSeek episodes: input 22,200,124 and output 3,397,110 toke
 
 - https://developers.openai.com/api/docs/models/gpt-4o
 - https://developers.openai.com/api/docs/guides/function-calling
-- https://aigcbest.top/ (connection documentation; account prices require separate evidence)
+- Account pricing is verified against the locally configured QDD route.

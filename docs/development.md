@@ -12,6 +12,7 @@ We use `uv`. You can follow the instructions on the [website](https://docs.astra
 - Install all the packages with `uv sync --dev --group docs --all-extras --no-lock` (include `--all-extras` if you want to work on the PI detector and `--group docs` if you want to run the docs offline.)
 - Lint with `uv run ruff --fix`
 - Format with `uv run ruff format`
+- To run the optional Git hooks, use `pre-commit install --config .github/pre-commit-config.yaml`.
 - Test with `uv run pytest tests`
 - Run the static type checker with `uv run pyright`
 

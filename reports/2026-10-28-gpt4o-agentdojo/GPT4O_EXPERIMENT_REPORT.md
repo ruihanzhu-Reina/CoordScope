@@ -14,7 +14,7 @@
 | Planner / Audit | task_conditioned / heuristic |
 | max_turns / repair_budget / max_tool_iterations | 2 / 1 / 8 |
 | 单请求输出 / 超时 / episode 进程并发 | 4096 tokens / 180 秒 / 8 |
-| 请求模型 / provider / endpoint | gpt-4o / qdd / https://api2.aigcbest.top/v1 |
+| 请求模型 / provider | gpt-4o / qdd |
 | 正式累计费用上限 | 用户指定 $100，重启共享原账本 |
 | Pilot | 完成 4/8 后由用户停止，剩余验收经用户选择跳过；正式 manifest 保留该记录 |
 
