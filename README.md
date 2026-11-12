@@ -2,6 +2,8 @@
 
 将 MANTA SelfEvolvedEngine 接入 AgentDojo 官方任务、工具、direct 攻击和 utility/security 评分。本仓库保留官方 AgentDojo 与固定 MANTA 快照，适配层位于 `src/agentdojo_manta/`。
 
+**[Research Demo](demo/README.md)** · Offline interactive showcase, archived trace replay, and reproducibility notes.
+
 **[最新正式实验汇总：6 种配置与 F/W 对照](reports/2026-10-29-completed-experiments/README.md)**
 
 每组使用相同 80 个场景（76 个不同用户任务），Clean/Attack 各 80 条；下面只列有比较价值的完整正式配置。

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="description" content="MANTA × AgentDojo 离线研究演示。探索多智能体系统中的信息暴露、执行路径、拓扑与协作成本。">
+  <title>超越通信拓扑 · MANTA × AgentDojo</title>
+  <link rel="icon" href="assets/icons.svg#brand" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="assets/app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">跳到正文</a>
+  <header class="topbar">
+    <a class="brand" href="#overview">
+      <span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#network"/></svg></span>
+      <span>MANTA <span class="brand-times">×</span> AgentDojo<small>RESEARCH SHOWCASE</small></span>
+    </a>
+    <div class="header-actions">
+      <span class="offline"><span></span>离线证据</span>
+      <button id="present" class="button primary" type="button" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="assets/icons.svg#screen"/></svg><span>演示模式</span></button>
+    </div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <nav id="navigation" aria-label="研究章节"></nav>
+      <div class="sidebar-foot"><span class="muted mono">MANTA × AGENTDOJO</span><p>官方评分 · 归档记录</p></div>
+    </aside>
+    <main id="main" tabindex="-1">
+      <div id="page" aria-live="off"><p class="loading" role="status">正在读取本地实验记录…</p></div>
+      <footer id="page-footer" class="page-footer" hidden></footer>
+    </main>
+  </div>
+  <dialog id="replay-dialog" aria-labelledby="replay-heading"></dialog>
+  <noscript>请启用 JavaScript 以查看本地实验记录与交互图表。</noscript>
+</body>
+</html>
