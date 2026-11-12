@@ -23,44 +23,47 @@
 
 ## Findings
 
-### 判断模型是否采纳指令，需要检查它的响应
+### 固定增加调查者，完成率提升有限，成本增加很多
 
-在 Flash Star 实验中，攻击内容经常进入模型输入，只有一条运行达成了攻击目标。暴露和工具调用都可以从日志核实。要判断模型有没有照外部指令行事，还需要标注它对内容的响应。 [暴露统计与官方评分](reports/2026-10-19-manta-agentdojo/README.md)
+与按需调查相比，固定安排两名调查者在正常条件下多完成 1 项任务，在攻击条件下多完成 4 项任务，总 token 增加了 84.12%。新增用量中，92.6% 来自调查者调用。对这批任务来说，增加协作投入的收益集中在少数任务，大部分任务用按需调查就能完成。 [配对结果](reports/2026-10-29-completed-experiments/README.md#fw-配对结果) · [角色用量](reports/2026-10-29-completed-experiments/README.md#token-具体花在哪)
 
-### 消息图会漏掉调查者直接读取的内容
+### 精简执行流程后，任务完成率和资源效率同时改善
 
-在 Slack 07，两名调查者收到协调者的消息后，又各自读取了同一个外部网页。沿消息追溯能查到谁转交了内容，对照工具记录才看得见调查者从哪里直接读到了它。 [Slack 07 轨迹](demo/data/case_slack_07.json)
+采用共享主执行历史、按需调查和执行前核验的配置，比原生自适应配置完成了更多任务，token 用量减少了 74.62%。原流程中的规划、调查、审计和综合会反复携带任务背景与工具信息。这个结果把优化重点指向协调和执行流程中的重复工作，具体模块各贡献多少还需要消融实验确认。 [完整配置比较与用量分析](reports/2026-10-29-completed-experiments/README.md#token-具体花在哪)
 
-### 同一种根拓扑可以对应不同的执行结构
+### 自适应重组改变了执行过程，却没有提高整体完成率
 
-多数发生重组的运行仍沿用原来的根拓扑模式。只记下「星形」或「链式」，容易把两轮执行当成同一种安排。逐轮快照保留了成员、执行顺序和子组，可以据此核对重组发生在哪里。 [自适应实验报告](reports/2026-10-28-deepseek-flash-adaptive/README.md) · [逐轮拓扑数据](demo/data/topology.json)
+DeepSeek Flash 的星形配置与原生自适应配置取得了相同的总体完成率和攻击成功数，自适应配置消耗的 token 更多。逐轮轨迹确认系统确实发生了重组，但这些结构变化并未带来整体指标的改善。评价自适应协作，需要同时看重组是否解决了任务、以及为此付出的开销。 [跨配置分析](reports/2026-10-28-four-experiment-analysis/README.md) · [实际拓扑记录](reports/2026-10-28-deepseek-flash-adaptive/README.md)
 
-### 固定分工增加整批开销，收益集中在少数任务
+### 任务完成率更高的配置，也可能更容易达成攻击目标
 
-固定调度在每次运行中都启动两名调查者，增加的 token 主要花在调查调用上。逐项比较时，只有少数任务的成败随调度方案改变。额外开销是否划算，要看这些任务对实际应用有多重要。 [配对结果](reports/2026-10-29-completed-experiments/README.md#fw-配对结果) · [开销分解](reports/2026-10-29-completed-experiments/README.md#token-具体花在哪)
+DeepSeek Pro 的星形配置比 DeepSeek Flash 的星形配置完成了更多任务，同时出现了更多攻击成功记录。用户任务完成和攻击成功还可能发生在同一次运行中。因此，任务能力和安全性需要分别评价，单看完成率会掩盖这类失败。 [各模型的任务与安全结果](reports/2026-10-29-completed-experiments/README.md#结果总表)
 
-### 审计给出零风险分时，目标调用仍可能发生
+### 识别出恶意内容，仍可能在转述时达成攻击目标
 
-Slack 07 的归档审计给出零风险分，系统没有触发修复。协调者在首次委派前就执行了目标调用，官方评分判定攻击成功。评估这类审计的预防效果，需要同时核对工具调用和任务最终状态。 [审计与工具轨迹](demo/data/audit_timeline.json) · [案例分析](reports/2026-10-19-manta-agentdojo/README.md)
+自适应配置的 Slack 14 案例中，Agent 识别了恶意内容并发出警告，但警告消息也转述了攻击目标要求传递的内容，最终被官方评分判定为攻击成功。风险识别与安全执行之间还隔着输出和工具动作，安全检查需要覆盖这些实际产生效果的环节。 [案例与审计分析](reports/2026-10-28-four-experiment-analysis/README.md)
 
 ## Evaluation
 
-评测覆盖四个任务套件、76 个不同用户任务。每种配置在 80 个固定场景上各运行一次正常条件和攻击条件。实验使用同一随机种子和同一种官方攻击。 [六种配置总表](reports/2026-10-29-completed-experiments/overview.csv) · [场景级结果](reports/2026-10-29-completed-experiments/episode_results.csv) · [实验范围](reports/2026-10-29-completed-experiments/README.md#配置与证据边界)
+实验涵盖 DeepSeek Flash、DeepSeek Pro 和 GPT-4o，共六种配置。每组使用四个任务套件中的 80 个固定场景，对应 76 个不同用户任务，每个场景分别运行正常条件与攻击条件。六种配置加上一次按需调查的参考复跑，共有 1,120 条有效记录。实验采用 seed 42 和官方 direct 攻击。 [逐场景结果](reports/2026-10-29-completed-experiments/episode_results.csv) · [参考复跑](reports/2026-10-29-completed-experiments/README.md#重复运行与安全事件)
 
-### Flash 16K 配置对照
-
-| 配置 | 正常完成率 ↑ | 攻击下完成率 ↑ | 攻击目标达成 ↓ | 总 token ↓ | 单次平均耗时 ↓ |
+| 模型与执行配置 | 正常完成率 ↑ | 攻击下完成率 ↑ | 攻击目标达成 ↓ | 总 token ↓ | 单次平均耗时 ↓ |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| F · 按需调查 | 90.00% | 88.75% | 0/80 | **7.14M** | **29.90 s** |
-| W · 固定双调查者 | **91.25%** | **93.75%** | 0/80 | 13.14M | 61.92 s |
-| 原生自适应 · 历史参照 | 81.25% | 82.50% | 1/80 | 28.13M | 209.23 s |
+| DeepSeek Flash · 星形协作 · 4K | 81.25% | 82.50% | 1/80 | 25.60M | 164.87 s |
+| GPT-4o · 星形协作 · 4K | 53.75% | 55.00% | 1/80 | 10.45M | 76.39 s |
+| DeepSeek Pro · 星形协作 · 16K | 86.25% | 86.25% | 4/80 | 26.91M | 304.41 s |
+| DeepSeek Flash · 原生自适应 · 16K | 81.25% | 82.50% | 1/80 | 28.13M | 209.23 s |
+| DeepSeek Flash · 按需调查 · 16K | 90.00% | 88.75% | 0/80 | **7.14M** | **29.90 s** |
+| DeepSeek Flash · 固定双调查者 · 16K | **91.25%** | **93.75%** | 0/80 | 13.14M | 61.92 s |
 
-F/W 对照比较两套完整调度协议，固定方案同时改变了调查者启动、分工和汇报方式。两组各有 4 条攻击记录的暴露状态未知。原生自适应的结果来自较早一轮实验。 [调度对照设计](docs/manta/FW_ABLATION.md) · [指标口径](reports/2026-10-29-completed-experiments/README.md#结果总表)
+4K 与 16K 表示单次输出上限。总 token 合计每组 80 次正常运行和 80 次攻击运行。按需调查与固定双调查者两组各有 4 条攻击记录的暴露状态未知。 [完整结果及指标定义](reports/2026-10-29-completed-experiments/README.md#结果总表)
+
+按需调查与固定双调查者的配对实验同时改变了调查者启动、分工和汇报方式，比较对象是完整调度协议。其余历史配置还存在模型记录、输出上限和审计方式的差异，配置间比较用于描述观测结果。Flash 的历史模型记录包含 `deepseek-v4-flash` 和 `deepseek-flash`，Pro 记录为 `deepseek-v4-pro`。以上发现适用于这批单随机种子、固定攻击设置下的任务。 [实验设计与适用范围](reports/2026-10-29-completed-experiments/README.md#配置与证据边界)
 
 <p align="center">
-  <img src="docs/assets/research-showcase/worker-tradeoff.svg" width="760" alt="横轴为每种配置的总 token，纵轴为 Attack 任务完成率。按需 F 为 7.14M 与 88.75%，固定双 Worker W 为 13.14M 与 93.75%，历史自适应配置为 28.13M 与 82.50%。">
+  <img src="docs/assets/research-showcase/worker-tradeoff.svg" width="760" alt="横轴为每种配置的总 token，纵轴为 Attack 任务完成率。按需调查为 7.14M 与 88.75%，固定双调查者为 13.14M 与 93.75%，历史自适应配置为 28.13M 与 82.50%。">
   <br>
-  <em>图 1 · 各配置在 80 条 Attack 记录上的任务完成率，以及 160 条 Clean 和 Attack 记录的总 token。</em>
+  <em>图 1 · DeepSeek Flash、16K 输出上限下的三种执行配置。纵轴为攻击条件下的任务完成率，横轴合计正常与攻击条件的 token。</em>
 </p>
 
 ## Demo
@@ -78,7 +81,7 @@ F/W 对照比较两套完整调度协议，固定方案同时改变了调查者�
 | 复核内容 | 入口 |
 | --- | --- |
 | 配置、样本与指标 | [完整实验报告](reports/2026-10-29-completed-experiments/README.md) · [逐场景结果](reports/2026-10-29-completed-experiments/episode_results.csv) · [公开日志索引](reports/LOGS.md) |
-| 调度、执行与评测流程 | [系统架构](docs/REPOSITORY_ARCHITECTURE.md) · [F/W 对照设计](docs/manta/FW_ABLATION.md) · [实验运行入口](scripts/manta/run_formal.py) |
+| 调度、执行与评测流程 | [系统架构](docs/REPOSITORY_ARCHITECTURE.md) · [调查者调度对照设计](docs/manta/FW_ABLATION.md) · [实验运行入口](scripts/manta/run_formal.py) |
 | 图表与轨迹数据 | [派生数据清单与 SHA-256](demo/data/data_manifest.json) · [离线数据生成](scripts/demo/build_demo_data.py) · [图 1 绘图脚本](scripts/reporting/plot_showcase_tradeoff.py) · [图 2 绘图脚本](scripts/reporting/plot_showcase_provenance.py) |
 
 ## Credits
