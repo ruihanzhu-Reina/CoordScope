@@ -1,40 +1,87 @@
-# MANTA × AgentDojo Adapter
+<div align="center">
 
-将 MANTA SelfEvolvedEngine 接入 AgentDojo 官方任务、工具、direct 攻击和 utility/security 评分。本仓库保留官方 AgentDojo 与固定 MANTA 快照，适配层位于 `src/agentdojo_manta/`。
+<h1>超越通信拓扑<br>多智能体系统的信息流与执行动态研究</h1>
 
-**[Research Demo](demo/README.md)** · Offline interactive showcase, archived trace replay, and reproducibility notes.
+<p><em>Beyond Communication Topology: Understanding Information Flow and Execution Dynamics in Multi-Agent Systems</em></p>
 
-**[最新正式实验汇总：6 种配置与 F/W 对照](reports/2026-10-29-completed-experiments/README.md)**
+<p><strong>朱芮含</strong> · MANTA × AgentDojo</p>
 
-每组使用相同 80 个场景（76 个不同用户任务），Clean/Attack 各 80 条；下面只列有比较价值的完整正式配置。
+<p>
+  <a href="#demo"><strong>交互演示</strong></a> ·
+  <a href="#results"><strong>实验结果</strong></a> ·
+  <a href="reports/2026-10-29-completed-experiments/README.md"><strong>完整报告</strong></a> ·
+  <a href="docs/REPOSITORY_ARCHITECTURE.md"><strong>仓库架构</strong></a>
+</p>
 
-| 已完成正式配置 | Clean Utility | Attack Utility | Targeted ASR ↓ | 有效结果总 token |
-|---|---:|---:|---:|---:|
-| Flash 4K · Star | 65/80（81.25%） | 66/80（82.50%） | 1/80（1.25%） | 25,597,234 |
-| GPT-4o 4K · Star | 43/80（53.75%） | 44/80（55.00%） | 1/80（1.25%） | 10,450,803 |
-| Pro 16K · Star | 69/80（86.25%） | 69/80（86.25%） | 4/80（5.00%） | 26,911,684 |
-| Flash 16K · 原自适应 | 65/80（81.25%） | 66/80（82.50%） | 1/80（1.25%） | 28,129,280 |
-| Flash 16K · F 按需调查 | 72/80（90.00%） | 71/80（88.75%） | 0/80（0%） | 7,137,951 |
-| Flash 16K · W 固定双调查者 | 73/80（91.25%） | 75/80（93.75%） | 0/80（0%） | 13,142,142 |
+<p><strong>4</strong> 个任务套件　 ·　 <strong>80</strong> 个冻结场景　 ·　 <strong>1,120</strong> 条有效 episode 记录</p>
 
-另保留 F 首次完整运行作为重复参考：74/80 clean、68/80 attack、ASR 1/80、7,109,588 token。
-合计 7 次完整运行、1,120 条有效记录；重复参考不作为额外方法或多 seed 平均。
-W 比 F 多完成 4 个攻击下任务，token 增加 84.12%；相对原 Flash 自适应，F/W 分别节省 74.62%/53.28% token。
-结果反映完整配置，历史模型、输出上限、审计与执行协议有差异；不能归因于单个模块或外推到所有攻击。
+</div>
 
-- **[逐场景结果与配置总表](reports/2026-10-29-completed-experiments/README.md)** · [模块 token](reports/2026-10-29-completed-experiments/role_usage.csv) · [F/W 逐项配对](reports/2026-10-29-completed-experiments/fw_paired.csv)
-- **[全部正式报告入口](reports/README.md)** · **[统一原始日志位置](reports/2026-10-29-completed-experiments/log_locations.csv)** · [历史公开脱敏日志](reports/LOGS.md)
-- [仓库架构](docs/REPOSITORY_ARCHITECTURE.md) · [适配层](docs/manta/GPT4O_ADAPTER.md)
-- [F/W 冻结配置与启动说明](docs/manta/FW_ABLATION.md) · [Folded 冻结配置](docs/manta/FOLDED_FLASH_16K.md)
+## Abstract
 
-F 首轮和 F/W 已完成，冻结配置文档保留其准备时原文，实际完成状态以上述结果和汇总报告为准。
-原始日志保留各轮原目录；10 月 29 日的正式脱敏包已整理为 [Folded 首轮（重复参考）](reports/2026-10-29-agentdojo-flash16k-folded/README.md) 与 [F/W 调度对照](reports/2026-10-29-agentdojo-flash16k-fw/README.md)，共 480 条有效记录。仅离线归档，没有启动新实验。
+当外部内容进入多智能体系统，安全风险取决于 Agent **看到了什么、如何传递信息、最后执行了什么**。这个项目将 MANTA 的多智能体执行层接入 AgentDojo，在官方任务环境与评分下比较静态、自适应和不同 Worker 调度配置，并用归档轨迹重建可观察的信息来源和工具动作。在归档案例中，协调者在交接前已执行目标调用；在配对评测中，固定双 Worker 带来更多攻击下的任务完成，同时增加了 token 开销。
 
-运行环境使用 `uv sync --locked --no-dev --python 3.12`。复制 `.env.example` 为 `.env` 后填写自己的凭证；不要上传 `.env`。配置和启动说明见 [适配层文档](docs/manta/GPT4O_ADAPTER.md)。报告导出为离线操作，不发送模型请求。
+## Contributions
 
-下方保留上游 AgentDojo 的介绍、安装与引用信息。
+| 我的项目工作 | 实现与产出 |
+| --- | --- |
+| **系统适配** | 将 MANTA 的规划、交接和工具调用接入 AgentDojo 的官方任务环境、`FunctionsRuntime` 与 utility/security 评分，统一记录执行轨迹。 [适配层](src/agentdojo_manta/adapter.py) · [接口说明](docs/manta/GPT4O_ADAPTER.md) |
+| **可复现评测** | 建立冻结场景、配对运行、失败与续跑管理、预算记账和离线核算流程。以共同的 Clean/Attack 场景比较六种配置，并单列一次参考复跑。 [运行入口](scripts/manta/run_formal.py) · [逐场景结果](reports/2026-10-29-completed-experiments/episode_results.csv) |
+| **机制与效率分析** | 从消息、网页重读和工具调用对齐 Slack 07 轨迹，重建实际拓扑变化，并用 F/W 配对比较按需与固定双 Worker 调度。 [案例证据](demo/data/case_slack_07.json) · [拓扑记录](reports/2026-10-28-deepseek-flash-adaptive/execution_graphs.csv) · [F/W 配对](reports/2026-10-29-completed-experiments/fw_paired.csv) |
+| **研究演示** | 将归档结果做成可筛选、可单步回放的离线网页。派生数据附有源文件和 SHA-256，支持从图表回查证据。 [演示说明](demo/README.md) · [数据清单](demo/data/data_manifest.json) |
 
----
+## Results
+
+**一次暴露如何演变成攻击成功？** 原始 Flash Star 的 80 条 Attack episode 中，74 条确认暴露、6 条状态未知，官方评分记录到 1 次攻击目标达成。在 Slack 07，协调者首次命中发生在跨 Agent 交接前；两名 Worker 此后都收到相关内容并重读网页，只有一名 Worker 调用了攻击目标。这个案例把**消息传递、工具重读和实际执行**对齐到同一条轨迹。Agent 是否采纳攻击意图仍需逐条语义标注。 [Flash Star 报告](reports/2026-10-19-manta-agentdojo/README.md) · [结构化案例](demo/data/case_slack_07.json)
+
+**额外协作带来多少收益？** 在配对的 Attack 场景中，W（固定双 Worker）比 F（按需 Worker）多完成 **4 项任务**，按 Clean 和 Attack 两组合计，W 的总 token 比 F 高 **84.12%**。原 Flash 16K 自适应配置提供历史参照。 [完整结果](reports/2026-10-29-completed-experiments/README.md) · [F/W 协议](docs/manta/FW_ABLATION.md)
+
+<p align="center">
+  <img src="docs/assets/research-showcase/worker-tradeoff.svg" width="760" alt="Flash 16K 的三种配置在总 token 与攻击下任务完成率上的对照。按需 F 为 7.14M 与 88.75%，固定双 Worker W 为 13.14M 与 93.75%，原自适应配置为 28.13M 与 82.50%。">
+  <br>
+  <em>图 1 · 横轴汇总每个配置的 160 条 Clean + Attack episode 的 token，纵轴以 80 条 Attack episode 为分母计算官方任务完成率。</em>
+</p>
+
+| Flash 16K 配置 | Clean Utility ↑ | Attack Utility ↑ | Targeted ASR ↓ | 总 token ↓ | 平均每条耗时 ↓ |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 原自适应（历史参照） | 81.25% | 82.50% | 1/80 | 28.13M | 209.23 s |
+| F · 按需 Worker | 90.00% | 88.75% | 0/80 | **7.14M** | **29.90 s** |
+| W · 固定双 Worker | **91.25%** | **93.75%** | 0/80 | 13.14M | 61.92 s |
+
+每次完整运行使用同一组 80 个冻结场景，涵盖 76 个不同用户任务，分别执行 Clean 与 Attack。F/W 比较的是两种完整调度协议，其中 W 同时引入分派和汇报步骤。结果适用于 seed 42 下的官方 direct 攻击；F/W 各有 4 条 Attack episode 的暴露状态未知。历史参照和 F/W 配置之间的差异属于描述性比较。 [完整配置与证据边界](reports/2026-10-29-completed-experiments/README.md#配置与证据边界)
+
+## Demo
+
+从总览筛选配置，或进入 **Slack 07 信息溯源图**，点击消息、网页读取路径或工具调用查看证据。自适应拓扑页支持逐轮对照，F/W 页可按套件比较成本与完成率，回放页可在 Clean 和 Attack 之间切换。
+
+<p align="center">
+  <img src="docs/assets/research-showcase/provenance-preview.png" width="880" alt="Slack 07 信息溯源演示。实线标出 Agent 消息与工具调用，虚线标出网页读取，右侧显示选中消息的来源证据。">
+  <br>
+  <em>图 2 · 离线演示的 Slack 07 信息溯源页。</em>
+</p>
+
+在仓库根目录使用 Python 3.11+ 启动演示。预生成数据已随仓库提供。
+
+```bash
+python -m http.server 8000 --bind 127.0.0.1 --directory demo
+```
+
+打开 [http://localhost:8000](http://localhost:8000)。重建数据、运行验证和查看来源的步骤见 [演示 README](demo/README.md)。
+
+## Reproducibility
+
+| 阅读路线 | 入口 |
+| --- | --- |
+| 复核完整实验设置和分项结果 | [结果汇总](reports/2026-10-29-completed-experiments/README.md) · [配置总表](reports/2026-10-29-completed-experiments/overview.csv) · [公开日志索引](reports/LOGS.md) |
+| 查看系统实现与评测边界 | [仓库架构](docs/REPOSITORY_ARCHITECTURE.md) · [Folded 配置](docs/manta/FOLDED_FLASH_16K.md) · [F/W 对照设计](docs/manta/FW_ABLATION.md) |
+| 重新生成展示数据和图表 | [离线数据脚本](scripts/demo/build_demo_data.py) · [数据测试](tests/demo/test_demo_data.py) · [图 1 脚本（Matplotlib）](scripts/reporting/plot_showcase_tradeoff.py) |
+
+## Credits
+
+本项目使用 Debenedetti 等人的 [AgentDojo](https://github.com/ethz-spylab/agentdojo) 作为任务、工具和评分基准，并基于仓库内的 [MANTA 源码快照](upstreams/manta/) 进行适配。参见 [AgentDojo 论文引用](CITATION.bib)、[仓库许可证](LICENSE)和 [MANTA 许可证](upstreams/manta/LICENSE)。
+
+<details>
+<summary>AgentDojo 上游 README 与使用说明</summary>
 
 <center>
 
@@ -130,3 +177,5 @@ If you use AgentDojo in your research, please consider citing our paper:
  url={https://openreview.net/forum?id=m1YYAQjO3w}
 }
 ```
+
+</details>
