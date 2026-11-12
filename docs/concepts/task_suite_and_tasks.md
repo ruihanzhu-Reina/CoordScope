@@ -2,7 +2,7 @@
 
 Defining your own task suite and tasks enables you to create new benchmarks to extend ours, or to create a new benchmark from scratch.
 
-You can find an example toy suite in our repo, in the `examples` [directory](https://github.com/ethz-spylab/agentdojo/tree/main/examples/counter_benchmark). This is the suite that we cover in this guide.
+You can find an example toy suite in the archived [examples](https://github.com/ruihanzhu-Reina/AgentDojo-MANTA-Adapter/tree/main/archive/examples/counter_benchmark). This is the suite that we cover in this guide.
 
 ## Task suite
 
@@ -70,7 +70,7 @@ Once the suite is created, you can register and run the benchmark by using our s
 --8<-- "counter_benchmark/benchmark.py"
 ```
 
-Then you can use our `check-suites` scripts to check whether the ground truths solve the tasks, and if all tasks are injectable. Assuming you are in the `examples` directory, you can run
+Then you can use our `check-suites` scripts to check whether the ground truths solve the tasks, and if all tasks are injectable. Assuming you are in the `archive/examples` directory, you can run
 
 ```bash
 python -m agentdojo.scripts.check_suites \

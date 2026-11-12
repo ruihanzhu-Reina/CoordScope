@@ -61,11 +61,11 @@ AgentDojo-MANTA-Adapter/
 │   ├── formal_80_seed42_gpt4o/       正式运行原始结果和完整 API 请求轨迹
 │   ├── pilot_4_seed42_gpt4o/         提前停止的 Pilot，与正式结果隔离
 │   └── gpt4o_preflight/              连通性、环境及零成本检查记录
-├── refine-logs/                      历史研究计划、阶段索引与发现
-│   ├── MANIFEST.md                   研究交付与历史阶段索引
-│   └── findings.md                   阶段性研究发现
+├── archive/                          研究归档和上游示例
+│   ├── examples/                     上游 AgentDojo 示例
+│   ├── notebooks/                    上游分析笔记本
+│   └── refine-logs/                  早期研究计划、交付索引与发现
 ├── runs/                            上游/历史运行材料，不进入本轮统计
-├── examples/ / notebooks/            上游示例与探索材料
 ├── util_scripts/                     上游数据表和结果处理辅助脚本
 ├── LICENSE / docs/CITATION.bib       许可证和上游引用信息
 └── .github/ / .devcontainer/          CI 与开发环境配置
@@ -103,7 +103,7 @@ GPT-4o 适配未重写 MANTA 的核心算法，也未修改官方任务、工具
 
 ## 如何阅读实验日志
 
-阶段性材料见 [研究交付索引](../refine-logs/MANIFEST.md) 和 [研究发现归档](../refine-logs/findings.md)。
+阶段性材料见 [研究交付索引](../archive/refine-logs/MANIFEST.md) 和 [研究发现归档](../archive/refine-logs/findings.md)。
 
 正式目录下 `attempts/<scene_id>__<condition>/attempt_NNN/` 保存每次尝试；完成且有效的结果才进入主表。单次 API 失败、余额不足和进程中断都作为独立执行证据保留。`logs/<job>/<attempt>/` 是官方 logger；`requests.jsonl` 是 API 请求前后的持久化记录；`result.json` 同时保存官方结果、runtime calls、交接和拓扑元数据。
 

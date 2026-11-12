@@ -44,7 +44,7 @@ And here is an example of how to register the attack using the decorator:
 
 ## Running the attack
 
-You can then run your attack by using our `benchmark` script and loading the corresponding attack module, and using the name of the attack with the `--attack` argument. Here is an example of how to run the attack (assuming you are in the `examples` directory):
+You can then run your attack by using our `benchmark` script and loading the corresponding attack module, and using the name of the attack with the `--attack` argument. Here is an example of how to run the attack (assuming you are in the `archive/examples` directory):
 
 ```bash
 python -m agentdojo.scripts.benchmark \

@@ -70,7 +70,7 @@ nav:
   - Changelog: changelog.md
 watch:
   - src
-  - examples
+  - archive/examples
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
@@ -80,7 +80,7 @@ markdown_extensions:
   - pymdownx.snippets:
       base_path:
         - docs
-        - examples
+        - archive/examples
         - src/agentdojo
       check_paths: true
   - pymdownx.superfences

@@ -384,8 +384,8 @@ pyrightconfig.json
 
 /attacks/
 
-examples/runs
-notebooks/plots/
+archive/examples/runs
+archive/notebooks/plots/
 
 runs/
 .claude

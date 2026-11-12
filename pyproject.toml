@@ -100,7 +100,7 @@ packages = ["src/agentdojo", "src/agentdojo_manta"]
 [tool.ruff]
 line-length = 120
 exclude = ["**/experimental", "**/notebooks"]
-# include = ["src/", "examples/", "scripts/", "tests/"]
+# include = ["src/", "archive/examples/", "scripts/", "tests/"]
 
 [tool.ruff.lint]
 ignore = []
