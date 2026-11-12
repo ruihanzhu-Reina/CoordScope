@@ -103,7 +103,9 @@ def main():
                 data = text.encode("utf-8")
                 redactor.scan(data)
             (destination / name).write_bytes(data)
-    (OUT / "FINDINGS.md").write_bytes(render(ROOT / "findings.md", redactor)[1])
+    _, findings = render(ROOT / "refine-logs" / "findings.md", redactor)
+    # Rebase report links from refine-logs/ to the published report folder.
+    (OUT / "FINDINGS.md").write_bytes(findings.replace(b"](../reports/", b"](../"))
     notes = dict(scope="All currently retained results/v1 paths whose first component starts with context_replay or graph_checkpoint",
         files=len(selected), raw_bytes=sum(f.stat().st_size for f in selected), archives=archives,
         redactions=dict(redactor.counts), notes=[
