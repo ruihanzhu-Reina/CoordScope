@@ -60,13 +60,7 @@
   <em>图 2 · 离线演示的 Slack 07 信息溯源页。</em>
 </p>
 
-在仓库根目录使用 Python 3.11+ 启动演示。预生成数据已随仓库提供。
-
-```bash
-python -m http.server 8000 --bind 127.0.0.1 --directory demo
-```
-
-打开 [http://localhost:8000](http://localhost:8000)。重建数据、运行验证和查看来源的步骤见 [演示 README](demo/README.md)。
+演示操作、数据来源与验证步骤见 [演示说明](demo/README.md)。
 
 ## Reproducibility
 
