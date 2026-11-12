@@ -6,7 +6,6 @@
 
 <p><strong>多智能体系统中的风险传播、工具执行与协作成本</strong></p>
 <p><em>Beyond Communication Topology: Risk Propagation, Tool Execution, and Collaboration Cost in Multi-Agent Systems</em></p>
-<p>朱芮含</p>
 
 <p>
   <a href="#findings">研究发现</a> ·
