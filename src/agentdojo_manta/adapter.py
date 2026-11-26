@@ -84,7 +84,11 @@ def _import_manta(paths: AdapterPaths):
 
 
 def _make_llm_client(paths: AdapterPaths, model: str | None = None, *, observer=None, thinking_protocol=False):
-    OpenRouterConfig, _SelfEvolvedConfig, OpenRouterLLMClient, _ExperimentSpec, _Engine = _import_manta(paths)
+    # Transport creation does not require the topology planner, repair engine,
+    # LangGraph executor or Folded loop. Load those only for their own profiles.
+    _ensure_manta_namespace(paths)
+    from MAS.config import OpenRouterConfig
+    from MAS.llm import OpenRouterLLMClient
 
     from agentdojo_manta.providers import provider_config, gpt4o_sampling, validate_gpt4o_response
     provider = provider_config(model)
@@ -299,6 +303,40 @@ def _make_llm_client(paths: AdapterPaths, model: str | None = None, *, observer=
                     setattr(actor_context, key, value)
 
         client.complete_folded = complete_folded
+
+        def complete_isolated(*, messages, agent_id, remaining_tokens, kind):
+            """One fresh, observed, no-tool request for the isolated interpreter.
+
+            Never inherits another planner/data/reviewer conversation or a
+            reasoning history containing external tool output. No mock fallback.
+            """
+            if client.client is None:
+                raise RuntimeError("Isolated execution requires configured live credentials")
+            from agentdojo_manta.deepseek_pro import ProReasoningHistory
+            previous = {key: getattr(actor_context, key, None) for key in
+                        ("agent_id", "agent_type", "generation_id", "pro_history", "folded_request")}
+            actor_context.agent_id = agent_id
+            actor_context.agent_type = kind
+            actor_context.generation_id = uuid.uuid4().hex
+            actor_context.pro_history = ProReasoningHistory()
+            actor_context.folded_request = True
+            try:
+                kwargs = client._apply_openrouter_sampling_overrides(
+                    dict(model=model_name, messages=messages, temperature=0.0), temperature=0.0)
+                kwargs.setdefault("timeout", client.config.timeout_s)
+                upper_input = len(json.dumps(kwargs, ensure_ascii=False).encode("utf-8")) + 4096
+                if upper_input + int(kwargs["max_tokens"]) > remaining_tokens:
+                    raise ValueError("Insufficient episode token budget for isolated request")
+                response = client._create_chat_completion_once(**kwargs)
+                if (not response.choices or response.choices[0].message.tool_calls or
+                        response.usage is None or not response.choices[0].message.content):
+                    raise ValueError("Isolated model must return JSON content and usage, with no tool calls")
+                return response
+            finally:
+                for key, value in previous.items():
+                    setattr(actor_context, key, value)
+
+        client.complete_isolated = complete_isolated
     return client
 
 

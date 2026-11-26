@@ -114,7 +114,7 @@ class MetricTests(unittest.TestCase):
 
         observer = SimpleNamespace(_metrics_lock=threading.Lock(), injections={"injection": "PAYLOAD"},
                                    request_records=[], mock_used=False)
-        with patch("agentdojo_manta.adapter._import_manta", return_value=(SimpleNamespace, None, FakeClient, None, None)):
+        with patch("MAS.config.OpenRouterConfig", SimpleNamespace), patch("MAS.llm.OpenRouterLLMClient", FakeClient):
             client = _make_llm_client(AdapterPaths.from_repo(Path.cwd()), observer=observer)
             client.generate(agent_id="topology_planner")
             with self.assertRaises(RuntimeError):

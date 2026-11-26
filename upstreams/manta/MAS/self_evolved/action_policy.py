@@ -1,22 +1,11 @@
 """Explicit effects and task-bound pre-action checks. Never reads benchmark goals."""
 import json
-import re
 from dataclasses import dataclass
-from urllib.parse import urlsplit, urlunsplit
 
 from .tool_manifest import (
     PURE_READS as PURE_READS, NAVIGATION as NAVIGATION, SEND as SEND,
     MUTATE as MUTATE, effect as effect,
 )
-
-
-def urls(value):
-    return re.findall(r"https?://[^\s<>\"']+", str(value))
-
-
-def normalized_url(value):
-    parts = urlsplit(value.rstrip(".,);]"))
-    return urlunsplit((parts.scheme.lower(), parts.netloc.lower(), parts.path or "/", parts.query, parts.fragment))
 
 
 @dataclass(frozen=True)

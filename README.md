@@ -20,6 +20,8 @@
 
 用配对实验与执行轨迹，研究多智能体如何协调、消耗多少资源，以及何时出现安全失败。
 
+新增实验实现：[`multicamel_governed`](docs/manta/MULTICAMEL_GOVERNED.md) 将跨 agent 的指令／数据隔离与现有参数授权网关组合，使用 MultiAgentDojo 原生角色划分。此模式采用本地受限计划解释器；机制测试与历史 benchmark 数字分开，尚无新版模型实测结果。
+
 <a name="findings"></a>
 
 ## <img src="docs/assets/research-showcase/sparkles.svg" width="28" height="28" alt=""> Findings

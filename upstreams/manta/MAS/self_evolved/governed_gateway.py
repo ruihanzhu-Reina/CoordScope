@@ -110,6 +110,7 @@ class GovernedGateway(ToolGateway):
             signature = (name, canonical(arguments))
             cap = self.capabilities.get(signature)
             if cap and cap["state"] == "committed":
+                self.store.grant(actor, [cap["evidence_id"]])
                 event.update(status="already_applied", capability_id=cap["id"])
                 return dict(already_applied=True, **self.store.read(actor, cap["evidence_id"]))
             if any(c["state"] in {"reserved", "unknown"} for c in self.capabilities.values()):
@@ -141,6 +142,7 @@ class GovernedGateway(ToolGateway):
                 return deny(str(exc))
             cap = self.capabilities.get(signature)
             if cap and cap["state"] == "committed":
+                self.store.grant(actor, [cap["evidence_id"]])
                 event.update(status="already_applied")
                 return dict(already_applied=True, **self.store.read(actor, cap["evidence_id"]))
             if needs_review:
