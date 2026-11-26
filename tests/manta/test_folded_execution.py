@@ -234,7 +234,8 @@ class TransportChecks(unittest.TestCase):
         budget = Budget()
         env = dict(MANTA_PROVIDER="deepseek", DEEPSEEK_MODEL="deepseek-flash", DEEPSEEK_API_KEY="local-test-placeholder",
                    DEEPSEEK_BASE_URL="https://api.deepseek.com/v1", MAS_DISABLE_LIVE_LLM="0", V1_REQUEST_JOURNAL="")
-        with patch.dict("os.environ", env), patch("agentdojo_manta.adapter._import_manta", return_value=(SimpleNamespace, None, Transport, None, None)), \
+        with patch.dict("os.environ", env), patch("MAS.config.OpenRouterConfig", SimpleNamespace), \
+             patch("MAS.llm.OpenRouterLLMClient", Transport), \
              patch("agentdojo_manta.budget.configured_budget", return_value=budget):
             client = _make_llm_client(AdapterPaths.from_repo(ROOT), "deepseek-flash", observer=observer, thinking_protocol=True)
             main_history = {"remaining_tokens": 400000}

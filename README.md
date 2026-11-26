@@ -20,6 +20,8 @@
 
 用配对实验与执行轨迹，研究多智能体如何协调、消耗多少资源，以及何时出现安全失败。
 
+新增实验实现：[`multicamel_governed`](docs/manta/MULTICAMEL_GOVERNED.md) 将跨 agent 的指令／数据隔离与现有参数授权网关组合，使用 MultiAgentDojo 原生角色划分。此模式采用本地受限计划解释器；机制测试与历史 benchmark 数字分开，尚无新版模型实测结果。
+
 <a name="findings"></a>
 
 ## <img src="docs/assets/research-showcase/sparkles.svg" width="28" height="28" alt=""> Findings
@@ -158,3 +160,10 @@
 ## Credits
 
 实验任务、工具与评分来自 AgentDojo，执行引擎来自仓库内的 MANTA 源码快照。 [AgentDojo 论文引用](docs/CITATION.bib) · [上游说明归档](archive/AGENTDOJO_UPSTREAM.md) · [MANTA 源码](upstreams/manta/) · [许可证](LICENSE)
+
+
+### Experimental runtime governance
+
+The new `folded_governed` profile adds exact task capabilities, checked evidence references and execution receipts. Existing published results belong to the earlier profiles; no new benchmark result is claimed. See [implementation and limits](docs/manta/runtime_governance.md).
+
+The [benchmark, baseline and metric plan](docs/manta/governance_evaluation.md) separates archived observations from untested design targets.
