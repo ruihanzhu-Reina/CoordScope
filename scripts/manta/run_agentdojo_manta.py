@@ -61,8 +61,8 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-turns", type=int, default=2)
     parser.add_argument("--repair-budget", type=int, default=1)
     parser.add_argument("--planner-mode", choices=["task_conditioned", "fixed"], default="task_conditioned")
-    parser.add_argument("--audit-mode", choices=["heuristic", "hybrid", "llm_judge", "selective_pre_action"], default="heuristic")
-    parser.add_argument("--team-profile", choices=["baseline", "adaptive_native", "folded_adaptive"], default="baseline")
+    parser.add_argument("--audit-mode", choices=["heuristic", "hybrid", "llm_judge", "selective_pre_action", "capability_gate"], default="heuristic")
+    parser.add_argument("--team-profile", choices=["baseline", "adaptive_native", "folded_adaptive", "folded_governed"], default="baseline")
     parser.add_argument("--worker-policy", choices=["on_demand", "fixed_two"], default="on_demand")
     parser.add_argument("--comparison-source-sha256", default=None)
     parser.add_argument("--benchmark-version", default="v1.2.2")
@@ -76,9 +76,9 @@ def _build_parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     args = _build_parser().parse_args()
-    if args.team_profile == "folded_adaptive":
+    if args.team_profile in {"folded_adaptive", "folded_governed"}:
         args.num_agents = 1
-        args.audit_mode = "selective_pre_action"
+        args.audit_mode = "capability_gate" if args.team_profile == "folded_governed" else "selective_pre_action"
         if args.max_turns != 2 or args.repair_budget != 1:
             raise SystemExit("Folded profile has one main phase and one bounded local recovery; keep max-turns=2 and repair-budget=1")
     if not args.clean and not (args.attack and args.injection_task):
@@ -191,7 +191,7 @@ def main() -> int:
     metadata = dict(pipeline.last_run_metadata)
     mock_used = pipeline.mock_used
     request_records = list(pipeline.request_records)
-    if os.getenv("MANTA_PROVIDER", "deepseek") != "deepseek" or pipeline.model == "deepseek-v4-pro" or args.team_profile in {"adaptive_native", "folded_adaptive"}:
+    if os.getenv("MANTA_PROVIDER", "deepseek") != "deepseek" or pipeline.model == "deepseek-v4-pro" or args.team_profile in {"adaptive_native", "folded_adaptive", "folded_governed"}:
         completed = [r for r in request_records if r.get("status") == "completed"]
         if not completed or getattr(pipeline, "provider_fatal_error", None) or any(not r.get("usage_available") for r in completed):
             error_status, error_message = "INFRA_ERROR", "Live usage/model validation failed; not a valid safety result"
@@ -212,7 +212,7 @@ def main() -> int:
         "adapter_source_digest": _source_digest([repo_root / "src" / "agentdojo_manta", Path(__file__)]),
         "manta_commit": _manta_commit(manta_root),
         "manta_source_digest": _source_digest([manta_root]),
-        "manta_source_status": "UPSTREAM_WITH_FOLDED_EXECUTION_PATCH" if args.team_profile == "folded_adaptive" else "UPSTREAM_WITH_ADAPTIVE_NATIVE_EXPERIMENT_PATCH" if args.team_profile == "adaptive_native" else "UPSTREAM_WITH_TOOL_PROTOCOL_PATCH",
+        "manta_source_status": "UPSTREAM_WITH_FOLDED_GOVERNANCE_PATCH" if args.team_profile == "folded_governed" else "UPSTREAM_WITH_FOLDED_EXECUTION_PATCH" if args.team_profile == "folded_adaptive" else "UPSTREAM_WITH_ADAPTIVE_NATIVE_EXPERIMENT_PATCH" if args.team_profile == "adaptive_native" else "UPSTREAM_WITH_TOOL_PROTOCOL_PATCH",
         "team_profile": args.team_profile,
         "worker_policy": args.worker_policy,
         "comparison_source_sha256": comparison_source,

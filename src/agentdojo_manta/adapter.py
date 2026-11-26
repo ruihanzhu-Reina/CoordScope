@@ -28,6 +28,8 @@ from agentdojo.types import (
     text_content_block_from_string,
 )
 
+FOLDED_PROFILES = frozenset({"folded_adaptive", "folded_governed"})
+
 
 @dataclass(frozen=True)
 class AdapterPaths:
@@ -56,15 +58,8 @@ class AgentDojoTask:
     benchmark_name: str
 
 
-def _import_manta(paths: AdapterPaths):
-    """Import MANTA without executing its eager top-level package imports.
-
-    MANTA's top-level ``MAS.__init__`` imports every benchmark adapter.  AgentDojo
-    has its own dependency graph, so loading MANTA as a namespace package avoids
-    importing unrelated benchmark integrations while still executing the official
-    self-evolved engine and its relative imports.
-    """
-
+def _ensure_manta_namespace(paths: AdapterPaths):
+    """Expose vendored modules without executing MANTA's eager package imports."""
     manta_root = str(paths.manta_root.resolve())
     if manta_root not in sys.path:
         sys.path.insert(0, manta_root)
@@ -74,6 +69,11 @@ def _import_manta(paths: AdapterPaths):
         package.__path__ = [str(paths.manta_root / "MAS")]
         package.__package__ = "MAS"
         sys.modules["MAS"] = package
+
+
+def _import_manta(paths: AdapterPaths):
+    """Import the pinned engine without unrelated benchmark integrations."""
+    _ensure_manta_namespace(paths)
 
     from MAS.config import OpenRouterConfig, SelfEvolvedConfig  # type: ignore
     from MAS.llm import OpenRouterLLMClient  # type: ignore
@@ -268,7 +268,7 @@ def _make_llm_client(paths: AdapterPaths, model: str | None = None, *, observer=
             previous = {key: getattr(actor_context, key, None) for key in
                         ("agent_id", "agent_type", "generation_id", "pro_history", "folded_request")}
             actor_context.agent_id = agent_id
-            actor_context.agent_type = "auditor" if agent_id == "action_verifier" else "general"
+            actor_context.agent_type = "auditor" if agent_id in {"action_verifier", "policy_compiler"} else "general"
             actor_context.generation_id = history["generation_id"]
             actor_context.pro_history = history["wire"]
             actor_context.folded_request = True
@@ -305,6 +305,11 @@ def _make_llm_client(paths: AdapterPaths, model: str | None = None, *, observer=
 def _function_to_manta_tool(runtime: FunctionsRuntime, env: Env, function: Any, *, observer=None) -> dict[str, Any]:
     """Convert one AgentDojo Function into MANTA's tool schema + bound handler."""
 
+    # Also support standalone schema conversion before a pipeline is constructed.
+    if not getattr(sys.modules.get("MAS"), "__path__", None):
+        _ensure_manta_namespace(AdapterPaths.from_repo(Path(__file__).resolve().parents[2]))
+    from MAS.self_evolved.tool_manifest import tool_spec
+
     schema = function.parameters.model_json_schema()
 
     def handler(arguments: dict[str, Any]) -> Any:
@@ -321,30 +326,12 @@ def _function_to_manta_tool(runtime: FunctionsRuntime, env: Env, function: Any, 
             return {"error": error}
         return value
 
-    mutation_verbs = {
-        "add",
-        "book",
-        "cancel",
-        "create",
-        "delete",
-        "modify",
-        "move",
-        "remove",
-        "rename",
-        "schedule",
-        "send",
-        "set",
-        "submit",
-        "update",
-        "write",
-    }
-    name_tokens = {token for token in function.name.replace("-", "_").split("_") if token}
     return {
         "name": function.name,
         "description": function.description,
         "parameters": schema,
         "handler": handler,
-        "side_effect": bool(name_tokens & mutation_verbs),
+        "side_effect": tool_spec(function.name).side_effect,
     }
 
 
@@ -441,11 +428,12 @@ class MantaAgentDojoPipeline(BasePipelineElement):
         self.paths = paths
         from agentdojo_manta.providers import provider_config
         self.model = provider_config(model).model
-        if team_profile not in {"baseline", "adaptive_native", "folded_adaptive"}:
+        if team_profile not in {"baseline", "adaptive_native", *FOLDED_PROFILES}:
             raise ValueError("Unknown team profile")
         self.team_profile = team_profile
-        adaptive = team_profile in {"adaptive_native", "folded_adaptive"}
-        folded = team_profile == "folded_adaptive"
+        folded = team_profile in FOLDED_PROFILES
+        adaptive = team_profile == "adaptive_native" or folded
+        self.governance_mode = "capability" if team_profile == "folded_governed" else "legacy"
         if worker_policy not in {"on_demand", "fixed_two"} or (worker_policy != "on_demand" and not folded):
             raise ValueError("Worker policy override requires the folded profile.")
         self.worker_policy = worker_policy
@@ -470,7 +458,7 @@ class MantaAgentDojoPipeline(BasePipelineElement):
         if folded:
             self.num_agents = 1
             self.max_initial_agents = 1
-            self.max_total_agents = 4  # main + two investigations + one verifier
+            self.max_total_agents = 5 if self.governance_mode == "capability" else 4
         self.se_config = SelfEvolvedConfig(
             harness_backend="openrouter",
             initial_planner_mode=initial_planner_mode,
@@ -489,7 +477,8 @@ class MantaAgentDojoPipeline(BasePipelineElement):
         if folded:
             from MAS.self_evolved.agent_loop import FoldedEngine
             config_path = Path(__file__).resolve().parents[2] / "docs/manta/flash_folded_config.json"
-            self._engine = FoldedEngine(client, json.loads(config_path.read_text(encoding="utf-8"))["folded"], worker_policy)
+            self._engine = FoldedEngine(client, json.loads(config_path.read_text(encoding="utf-8"))["folded"],
+                                        worker_policy, governance_mode=self.governance_mode)
         else:
             self._engine = SelfEvolvedEngine(client, self.se_config)
         self._experiment_spec = ExperimentSpec(
@@ -517,7 +506,7 @@ class MantaAgentDojoPipeline(BasePipelineElement):
 
         lookup: dict[str, str] = {}
         tasks = list(suite.user_tasks.values())
-        if self.team_profile != "folded_adaptive":
+        if self.team_profile not in FOLDED_PROFILES:
             tasks += list(suite.injection_tasks.values())
         for task in tasks:
             prompt = getattr(task, "PROMPT", None) or getattr(task, "GOAL", None)
@@ -534,7 +523,7 @@ class MantaAgentDojoPipeline(BasePipelineElement):
         extra_args: dict | None = None,
     ) -> tuple[str, FunctionsRuntime, Env, list[ChatMessage], dict]:
         extra_args = dict(extra_args or {})
-        if self.team_profile == "folded_adaptive":
+        if self.team_profile in FOLDED_PROFILES:
             self.request_records = []
             self.runtime_calls = []
             self.mock_used = False
@@ -569,10 +558,12 @@ class MantaAgentDojoPipeline(BasePipelineElement):
             "max_turns": self.se_config.max_turns,
             "repair_budget": self.se_config.repair_budget,
             "initial_planner_mode": self.se_config.initial_planner_mode,
-            "audit_mode": "selective_pre_action" if self.team_profile == "folded_adaptive" else self.se_config.audit_mode,
+            "audit_mode": "capability_gate" if self.team_profile == "folded_governed" else
+                          "selective_pre_action" if self.team_profile == "folded_adaptive" else self.se_config.audit_mode,
             "team_profile": self.team_profile,
             "worker_policy": self.worker_policy,
-            "write_protocol": "guarded_native" if self.team_profile == "folded_adaptive" else self.se_config.write_protocol,
+            "write_protocol": "capability_guarded_native" if self.team_profile == "folded_governed" else
+                              "guarded_native" if self.team_profile == "folded_adaptive" else self.se_config.write_protocol,
             "skill_update_batch_size": self.se_config.skill_update_batch_size,
         }
         extra_args = {**extra_args, "manta_run_metadata": metadata, "manta_trace_events": result.trace_events}

@@ -158,3 +158,10 @@
 ## Credits
 
 实验任务、工具与评分来自 AgentDojo，执行引擎来自仓库内的 MANTA 源码快照。 [AgentDojo 论文引用](docs/CITATION.bib) · [上游说明归档](archive/AGENTDOJO_UPSTREAM.md) · [MANTA 源码](upstreams/manta/) · [许可证](LICENSE)
+
+
+### Experimental runtime governance
+
+The new `folded_governed` profile adds exact task capabilities, checked evidence references and execution receipts. Existing published results belong to the earlier profiles; no new benchmark result is claimed. See [implementation and limits](docs/manta/runtime_governance.md).
+
+The [benchmark, baseline and metric plan](docs/manta/governance_evaluation.md) separates archived observations from untested design targets.
